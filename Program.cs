@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace LabWork
 {
@@ -38,16 +38,16 @@ namespace LabWork
     /// Допоміжний клас для пошуку валідних IPv4 адрес у тексті
     /// Використовує System.Text.RegularExpressions.Regex
     /// </summary>
-    class IpFinder
+    sealed class IpFinder
     {
         // Регекс, який знаходить потенційні IPv4 у тексті. Потім ми додатково перевіряємо кожен октет 0-255.
         // Пояснення: \b - межа слова, (?:\d{1,3}\.){3}\d{1,3} - чотири числа по 1-3 цифри, розділені крапками
-        private static readonly Regex CandidateRegex = new Regex(@"\b(?:\d{1,3}\.){3}\d{1,3}\b", RegexOptions.Compiled);
+        private static readonly Regex CandidateRegex = new Regex(@"\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d).){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\b", RegexOptions.Compiled);
 
-        public IEnumerable<string> FindIPv4Addresses(string text)
+        public IReadOnlyList<string> FindIPv4Addresses(string text)
         {
             var list = new List<string>();
-            if (string.IsNullOrEmpty(text)) return list;
+            if (string.IsNullOrEmpty(text)) return list.AsReadOnly();
 
             var matches = CandidateRegex.Matches(text);
             foreach (Match m in matches)
@@ -58,7 +58,7 @@ namespace LabWork
                 }
             }
 
-            return list;
+            return list.AsReadOnly();
         }
 
         // Перевіряємо, що кожен октет у межах 0-255
