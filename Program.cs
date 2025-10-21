@@ -4,11 +4,6 @@ using System.Text.RegularExpressions;
 
 namespace LabWork
 {
-    // Даний проект є шаблоном для виконання лабораторних робіт
-    // з курсу "Об'єктно-орієнтоване програмування та патерни проектування"
-    // Необхідно змінювати і дописувати код лише в цьому проекті
-    // Відео-інструкції щодо роботи з github можна переглянути 
-    // за посиланням https://www.youtube.com/@ViktorZhukovskyy/videos 
     class Program
     {
         static void Main(string[] args)
@@ -21,7 +16,8 @@ namespace LabWork
 тому що повинен бути виділений пробілами або пунктуацією. Також додаємо кілька випадкових чисел 300.300.300.300 та 256.256.256.256, 
 які НЕ є валідними IPv4-адресами і мають бути відфільтровані правилом.
 Ще кілька випадків у різних місцях: (123.45.67.89),
-і на новому рядку: 1.2.3.4; кінець тесту.";
+і на новому рядку: 1.2.3.4; кінець тесту
+01:23:45.";
 
             var finder = new IpFinder();
             var matches = finder.FindIPv4Addresses(sampleText);
@@ -31,6 +27,50 @@ namespace LabWork
             {
                 Console.WriteLine(ip);
             }
+
+            // Перевірка — чи містить текст якийсь час у форматі HH:MM або HH:MM:SS
+            bool hasTime = ContainsTime(sampleText);
+            Console.WriteLine();
+            Console.WriteLine($"Чи містить текст час? {(hasTime ? "Так" : "Ні")}");
+
+            // Вивід знайдених часів (якщо є)
+            var times = FindTimes(sampleText);
+            if (times.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Знайдені часи:");
+                foreach (var t in times)
+                {
+                    Console.WriteLine(t);
+                }
+            }
+        }
+
+        // Метод перевіряє наявність часу у форматах 0-23:00-59 або з секундами 00-59
+        private static bool ContainsTime(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+
+            // Простий регекс для часу: годинник 00-23, хвилини і секунди 00-59
+            // Формати: H:MM, HH:MM, HH:MM:SS
+            var timeRegex = new Regex(@"\b(?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?\b", RegexOptions.Compiled);
+            return timeRegex.IsMatch(text);
+        }
+
+        // Повертає всі знайдені збіги часу у тексті у вигляді списку рядків
+        private static IReadOnlyList<string> FindTimes(string text)
+        {
+            var list = new List<string>();
+            if (string.IsNullOrEmpty(text)) return list.AsReadOnly();
+
+            var timeRegex = new Regex(@"\b(?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?\b", RegexOptions.Compiled);
+            var matches = timeRegex.Matches(text);
+            foreach (Match m in matches)
+            {
+                list.Add(m.Value);
+            }
+
+            return list.AsReadOnly();
         }
     }
 
